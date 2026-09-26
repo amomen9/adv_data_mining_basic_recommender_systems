@@ -65,7 +65,7 @@ def similarity_matrix(matrix, k=5, axis=0):
                         similarity_scores[j] = []
 
                     similarity_scores[i].append((j, similarity))
-                    similarity_scores[j].append((i, similarity))    
+                    similarity_scores[j].append((i, similarity))
 
     # TO DO: If axis is 1, what do you need to do to calculate the similarity 
     # between items (columns)
@@ -129,15 +129,16 @@ def user_based_cf(user_id, movie_id, user_similarity, user_item_matrix, k=5):
         collaborative filtering
     """
     # TO DO: retrieve the topk most similar users for the target user
-
+    similar_users = user_similarity.get(user_id, [])[:k]    #
 
     # TO DO: implement user-based collaborative filtering according to the 
     # formula discussed during the lecture (reported in the PDF attached to 
     # the assignment)
     numerator = 0  
     denominator = 0  
-
-
+    numerator = np.sum(similar_users[:, 1]) * user_item_matrix.loc[[user[0] for user in similar_users], movie_id].values)
+    denominator = np.sum(np.abs(similar_users[:, 1]))
+    
     if denominator == 0:
         return np.nan  # no similar users or no valid ratings, NaN is returned.
 
@@ -166,14 +167,15 @@ def item_based_cf(user_id, movie_id, item_similarity, user_item_matrix, k=5):
         collaborative filtering
     """
     # TO DO: retrieve the topk most similar users for the target item
-
+    similar_items = item_similarity.get(movie_id, [])[:k]
 
     # TO DO: implement item-based collaborative filtering according to the 
     # formula discussed during the lecture (reported in the PDF attached to 
     # the assignment)
     numerator = 0  
     denominator = 0  
-
+    numerator = np.sum(similar_items[:, 1]) * user_item_matrix.loc[user_id, [item[0] for item in similar_items]].values)
+    denominator = np.sum(np.abs(similar_items[:, 1]))
 
     if denominator == 0:
         return np.nan  # no similar users or no valid ratings, NaN is returned.
@@ -214,6 +216,7 @@ def matrix_factorization(
 
     for step in range(n_steps):
         # TODO: Implement the algorithm to update user_matrix and item_matrix
+                
         pass
 
     return user_matrix, item_matrix
